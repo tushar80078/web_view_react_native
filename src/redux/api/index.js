@@ -4,6 +4,7 @@ import { logOutUser } from "@/redux/slice/auth.slice";
 
 export const RTK_TAGS = {
   GET_ENTERPRISES: "GET_ENTERPRISES",
+  GET_ROLES: "GET_ROLES",
 };
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {

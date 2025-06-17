@@ -2,6 +2,7 @@ import {
   AlignHorizontalSpaceAroundIcon,
   LayoutDashboardIcon,
   UserRoundIcon,
+  ShieldIcon,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -17,6 +18,12 @@ const routes = [
     label: "Enterprise Management",
     href: "/app/enterprise-management",
     mappingKey: "enterprises",
+  },
+  {
+    icon: ShieldIcon,
+    label: "Role Management",
+    href: "/app/role-management",
+    mappingKey: "roles",
   },
   {
     icon: LayoutDashboardIcon,

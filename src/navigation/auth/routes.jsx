@@ -1,5 +1,6 @@
 import UserManagement from "@/pages/Modules/UserManagement";
 import EnterPriseManagement from "@/pages/Modules/EnterPriseManagement";
+import RoleManagement from "@/pages/Modules/RoleManagement";
 import AuthLoading from "@/pages/Loading";
 
 export const authRoutes = [
@@ -24,10 +25,19 @@ export const authRoutes = [
   {
     path: "/enterprise-management",
     access: ["All"],
-    description: "This is for User management",
+    description: "This is for Enterprise management",
     element: <EnterPriseManagement />,
     isShowOnSidebar: false,
     icon: false,
-    title: "User Management",
+    title: "Enterprise Management",
+  },
+  {
+    path: "/role-management",
+    access: ["All"],
+    description: "This is for Role management",
+    element: <RoleManagement />,
+    isShowOnSidebar: false,
+    icon: false,
+    title: "Role Management",
   },
 ];
