@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { logOutUser } from "@/redux/slice/auth.slice";
 
 export const RTK_TAGS = {
-  //   GET_COURSES: "GET_COURSES",
+  GET_ENTERPRISES: "GET_ENTERPRISES",
 };
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {

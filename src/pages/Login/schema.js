@@ -9,6 +9,6 @@ const passwordValidation = yup.string().required("Password required");
 
 /* Email */
 export const LoginSchema = yup.object().shape({
-  email: emailValidation,
+  username: yup.string().required("Username required"),
   password: passwordValidation,
 });

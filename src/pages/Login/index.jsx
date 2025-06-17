@@ -34,7 +34,7 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     const response = await loginFn(data);
     if (response.data) {
-      navigate("/auth-loading");
+      navigate("/app/auth-loading");
     }
   };
 
@@ -55,7 +55,7 @@ const LoginPage = () => {
                 <Label>Email address</Label>
                 <Controller
                   control={control}
-                  name="email"
+                  name="username"
                   render={({ field: { onChange, value } }) => (
                     <Input
                       type="text"

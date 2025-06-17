@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 let initialState = {
   isLoggedIn: false,
   userDetails: false,
+  permissions: false,
 };
 
 export const userSlice = createSlice({
@@ -18,9 +19,12 @@ export const userSlice = createSlice({
       state.userDetails = false;
       localStorage.removeItem("token");
     },
+    setPermissions: (state, action) => {
+      state.permissions = action.payload;
+    },
   },
 });
 
-export const { loginUser, logOutUser } = userSlice.actions;
+export const { loginUser, logOutUser, setPermissions } = userSlice.actions;
 
 export default userSlice.reducer;
