@@ -1,7 +1,8 @@
+import PublicLayout from "@/layouts/public";
 import React from "react";
 
 const LandingPage = () => {
-  return <div>LandingPage</div>;
+  return <PublicLayout></PublicLayout>;
 };
 
 export default LandingPage;
