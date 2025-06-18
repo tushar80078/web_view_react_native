@@ -98,7 +98,10 @@ const RoleList = () => {
 
       <ResponseDialog
         title={editData ? "Edit Role" : "Add Role"}
-        onOpenChange={setOpen}
+        onOpenChange={() => {
+          setOpen(false);
+          handleFormClose();
+        }}
         open={open}
         description={
           editData

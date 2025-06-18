@@ -5,6 +5,7 @@ import { logOutUser } from "@/redux/slice/auth.slice";
 export const RTK_TAGS = {
   GET_ENTERPRISES: "GET_ENTERPRISES",
   GET_ROLES: "GET_ROLES",
+  GET_USERS: "GET_USERS",
 };
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
@@ -38,6 +39,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
+  keepUnusedDataFor: 0,
   tagTypes: Object.values(RTK_TAGS),
 });
 

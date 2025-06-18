@@ -11,6 +11,7 @@ export const roleAPI = apiSlice.injectEndpoints({
       }),
 
       transformErrorResponse: transferErrorResponse,
+
       invalidatesTags: [RTK_TAGS.GET_ROLES],
     }),
     updateRole: builder.mutation({

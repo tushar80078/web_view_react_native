@@ -20,11 +20,16 @@ import {
   useGetAvailableModulesQuery,
 } from "../api/role.api";
 import toast from "react-hot-toast";
+import { useLazyGetPermissionQuery } from "@/pages/Loading/api/loading.api";
+import useUserDetails from "@/hooks/useUserDetails";
 
 const RoleForm = ({ initialValues, onCancel, onSuccess }) => {
   const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
   const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation();
   const { data: modulesData } = useGetAvailableModulesQuery();
+
+  const [resetPermissionFn] = useLazyGetPermissionQuery();
+  const { data } = useUserDetails();
 
   const form = useForm({
     resolver: zodResolver(roleFormSchema),
@@ -126,6 +131,10 @@ const RoleForm = ({ initialValues, onCancel, onSuccess }) => {
           onCancel();
         }
       }
+      await resetPermissionFn(
+        { id: data?.user?.role_id },
+        { skip: !data?.user?.role_id }
+      );
     } catch (error) {
       console.error("Error:", error);
     }

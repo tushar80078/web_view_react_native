@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export const columns = [
   {
@@ -21,7 +22,7 @@ export const columns = [
       const enterprise = row.original;
       return (
         <div className="flex gap-2">
-          {enterprise.canEdit && (
+          {enterprise.canEdit ? (
             <Button
               variant="ghost"
               size="sm"
@@ -30,8 +31,10 @@ export const columns = [
             >
               <Edit className="h-4 w-4" />
             </Button>
+          ) : (
+            <Badge variant={"outline"}>NA</Badge>
           )}
-          {enterprise.canDelete && (
+          {enterprise.canDelete ? (
             <Button
               variant="ghost"
               size="sm"
@@ -40,6 +43,8 @@ export const columns = [
             >
               <Trash2 className="h-4 w-4" />
             </Button>
+          ) : (
+            <Badge variant={"outline"}>NA</Badge>
           )}
         </div>
       );

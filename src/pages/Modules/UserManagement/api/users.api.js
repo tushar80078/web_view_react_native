@@ -1,24 +1,64 @@
-import apiSlice from "@/redux/api/index";
+import apiSlice, { RTK_TAGS } from "@/redux/api/index";
 import { transferErrorResponse } from "@/lib/transferResponse";
-import { setPermissions } from "@/redux/slice/auth.slice";
 
 export const usersAPI = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    createUser: builder.query({
+    createUser: builder.mutation({
       query: (data) => ({
         url: `/users`,
         method: "POST",
-        data: data,
+        body: data,
       }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
-
-        dispatch(setPermissions(data.data.permissions));
-      },
 
       transformErrorResponse: transferErrorResponse,
+      invalidatesTags: [RTK_TAGS.GET_USERS],
+    }),
+    updateUser: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/users/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+
+      transformErrorResponse: transferErrorResponse,
+      invalidatesTags: [RTK_TAGS.GET_USERS],
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "DELETE",
+      }),
+
+      transformErrorResponse: transferErrorResponse,
+      invalidatesTags: [RTK_TAGS.GET_USERS],
+    }),
+    getAllUsers: builder.query({
+      query: () => ({
+        url: `/users`,
+        method: "GET",
+      }),
+
+      transformErrorResponse: transferErrorResponse,
+      providesTags: [RTK_TAGS.GET_USERS],
+    }),
+    toggleUserStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/users/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+
+      transformErrorResponse: transferErrorResponse,
+      invalidatesTags: [RTK_TAGS.GET_USERS],
     }),
   }),
 });
 
-export const { useGetPermissionQuery, useLazyGetPermissionQuery } = usersAPI;
+export const {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  useGetAllUsersQuery,
+  useLazyGetAllUsersQuery,
+  useToggleUserStatusMutation,
+} = usersAPI;

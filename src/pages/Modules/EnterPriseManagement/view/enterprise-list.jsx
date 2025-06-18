@@ -47,7 +47,7 @@ const EnterpriseList = () => {
     <div className="px-4 py-4">
       <div className="flex justify-between pb-4">
         <p className="text-xl  font-medium">Enterprise </p>
-        {currentModulePermissions?.can_create && (
+        {currentModulePermissions?.can_create ? (
           <Button
             onClick={() => {
               setOpen(true);
@@ -57,6 +57,8 @@ const EnterpriseList = () => {
             <PlusIcon />
             Add Enterprise
           </Button>
+        ) : (
+          ""
         )}
       </div>
 
