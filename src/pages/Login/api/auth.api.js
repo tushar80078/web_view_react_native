@@ -13,13 +13,20 @@ export const authApi = apiSlice.injectEndpoints({
       }),
 
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
+        try {
+          const { data } = await queryFulfilled;
 
-        localStorage.setItem("token", data.data.token);
+          // Store token
+          localStorage.setItem("token", data.data.token);
 
-        dispatch(loginUser(data.data));
+          // Dispatch user data to Redux store
+          dispatch(loginUser(data.data.user));
 
-        toast.success("Logged In!!");
+          toast.success("Login successful!");
+        } catch (error) {
+          // Error is handled by transformErrorResponse
+          console.error("Login error:", error);
+        }
       },
       transformErrorResponse: transferErrorResponse,
     }),

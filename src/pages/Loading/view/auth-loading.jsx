@@ -6,10 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 const AuthLoadingPage = () => {
   const { data } = useUserDetails();
-  useGetPermissionQuery(
-    { id: data?.user?.role_id },
-    { skip: !data?.user?.role_id }
-  );
+  console.log("data", data);
+  useGetPermissionQuery({ id: data?.role_id }, { skip: !data?.role_id });
   const navigate = useNavigate();
 
   const { allowedRoutes } = useUserDetails();

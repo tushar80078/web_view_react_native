@@ -6,6 +6,9 @@ export const RTK_TAGS = {
   GET_ENTERPRISES: "GET_ENTERPRISES",
   GET_ROLES: "GET_ROLES",
   GET_USERS: "GET_USERS",
+  GET_EMPLOYEES: "GET_EMPLOYEES",
+  GET_PRODUCTS: "GET_PRODUCTS",
+  GET_DASHBOARD: "GET_DASHBOARD",
 };
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {

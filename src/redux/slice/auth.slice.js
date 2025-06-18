@@ -17,6 +17,7 @@ export const userSlice = createSlice({
     logOutUser: (state) => {
       state.isLoggedIn = false;
       state.userDetails = false;
+      state.permissions = [];
       localStorage.removeItem("token");
     },
     setPermissions: (state, action) => {

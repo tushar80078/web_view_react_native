@@ -1,14 +1,16 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-const emailValidation = yup
+// Username validation
+const usernameValidation = z
   .string()
-  .required("Email required")
-  .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, "Invalid email");
+  .min(1, "Username required")
+  .min(3, "Username must be at least 3 characters");
 
-const passwordValidation = yup.string().required("Password required");
+// Password validation
+const passwordValidation = z.string().min(1, "Password required");
 
-/* Email */
-export const LoginSchema = yup.object().shape({
-  username: yup.string().required("Username required"),
+// Login schema
+export const LoginSchema = z.object({
+  username: usernameValidation,
   password: passwordValidation,
 });

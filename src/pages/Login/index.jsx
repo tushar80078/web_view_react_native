@@ -1,34 +1,34 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import PublicLayout from "@/layouts/public";
 import { LoginSchema } from "./schema";
-import FormError from "@/molecules/form-error";
-import Password from "@/molecules/password";
 import { useLoginMutation } from "./api/auth.api";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Loader2 } from "lucide-react";
+import { Loader2, OctagonAlertIcon } from "lucide-react";
 import React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [loginFn, { error, isLoading }] = useLoginMutation();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(LoginSchema),
+  const form = useForm({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
 
   const onSubmit = async (data) => {
@@ -39,65 +39,86 @@ const LoginPage = () => {
   };
 
   return (
-    <PublicLayout>
-      <div className="flex w-full justify-center items-center h-full ">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Card className="pb-6">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Login</CardTitle>
-              <CardDescription>
-                Enter your credentials to get started
-              </CardDescription>
-            </CardHeader>
+    <div className="flex w-full justify-center items-center h-screen px-4">
+      <Card className="overflow-hidden p-0 w-full max-w-md">
+        <CardContent className="grid p-0">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col items-center text-center">
+                  <h1 className="text-2xl font-bold">Welcome Back</h1>
+                  <p className="text-muted-foreground text-balance">
+                    Login to your account
+                  </p>
+                </div>
 
-            <CardContent className="w-[400px]">
-              <div className="flex flex-col gap-2">
-                <Label>Email address</Label>
-                <Controller
-                  control={control}
-                  name="username"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      type="text"
-                      placeholder="john@example.com"
-                      onChange={onChange}
-                      value={value}
-                    />
-                  )}
-                />
-              </div>
+                <div className="grid gap-3">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter your username"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <div className="flex flex-col  pt-3">
-                <Label>Password</Label>
-                <Password
-                  type="text"
-                  fieldName={"password"}
-                  control={control}
-                  placeholder="**********"
-                  errors={errors}
-                />
-              </div>
+                <div className="grid gap-3">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="*********"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <FormError error={error?.data?.err} />
-
-              <Button
-                type="submit"
-                className="mt-2 w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    Create Account <Loader2 className="animate-spin size-5" />
-                  </>
-                ) : (
-                  "Create Account"
+                {error && (
+                  <Alert className="bg-destructive/10 border-none">
+                    <OctagonAlertIcon className="h-4 w-4 !text-destructive" />
+                    <AlertTitle>
+                      {error?.data?.message ||
+                        error?.data?.err ||
+                        "Login failed. Please check your credentials."}
+                    </AlertTitle>
+                  </Alert>
                 )}
-              </Button>
-            </CardContent>
-          </Card>
-        </form>
-      </div>
-    </PublicLayout>
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      Signing in...{" "}
+                      <Loader2 className="animate-spin size-5 ml-2" />
+                    </>
+                  ) : (
+                    "Sign in"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

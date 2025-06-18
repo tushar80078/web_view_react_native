@@ -117,6 +117,20 @@ const RoleForm = ({ initialValues, onCancel, onSuccess }) => {
 
   const onSubmit = async (formData) => {
     try {
+      // Validate that at least one permission is selected
+      const hasAnyPermission = formData.permissions.some(
+        (permission) =>
+          permission.can_read ||
+          permission.can_create ||
+          permission.can_update ||
+          permission.can_delete
+      );
+
+      if (!hasAnyPermission) {
+        toast.error("Please select at least one permission for the role!");
+        return;
+      }
+
       if (isEdit) {
         const data = await updateRole({ id: initialValues.id, data: formData });
         if (data) {
@@ -174,136 +188,215 @@ const RoleForm = ({ initialValues, onCancel, onSuccess }) => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Permissions</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Permissions</h3>
+            <span className="text-sm text-muted-foreground">
+              Select at least one permission
+            </span>
+          </div>
+
+          {/* Quick Permission Presets */}
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const allPermissions = fields.map((field) => ({
+                  ...field,
+                  can_read: true,
+                  can_create: true,
+                  can_update: true,
+                  can_delete: true,
+                }));
+                replace(allPermissions);
+              }}
+            >
+              Full Access
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const readOnlyPermissions = fields.map((field) => ({
+                  ...field,
+                  can_read: true,
+                  can_create: false,
+                  can_update: false,
+                  can_delete: false,
+                }));
+                replace(readOnlyPermissions);
+              }}
+            >
+              Read Only
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const noPermissions = fields.map((field) => ({
+                  ...field,
+                  can_read: false,
+                  can_create: false,
+                  can_update: false,
+                  can_delete: false,
+                }));
+                replace(noPermissions);
+              }}
+            >
+              Clear All
+            </Button>
+          </div>
+
           <div className="space-y-4">
-            {fields.map((field, index) => (
-              <Card key={field.id}>
-                <CardHeader>
-                  <CardTitle className="text-base capitalize">
-                    {field.module} Module
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      name={`permissions.${index}.can_read`}
-                      control={form.control}
-                      render={({ field }) => {
-                        console.log(
-                          `can_read for ${fields[index]?.module}:`,
-                          field.value,
-                          typeof field.value
-                        );
-                        return (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={
-                                  field.value === true || field.value === 1
-                                }
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="text-sm font-normal">
-                                Read
-                              </FormLabel>
-                            </div>
-                          </FormItem>
-                        );
-                      }}
-                    />
+            {fields.map((field, index) => {
+              const hasAnyPermission =
+                field.can_read ||
+                field.can_create ||
+                field.can_update ||
+                field.can_delete;
 
-                    <FormField
-                      name={`permissions.${index}.can_create`}
-                      control={form.control}
-                      render={({ field }) => {
-                        console.log(
-                          `can_create for ${fields[index]?.module}:`,
-                          field.value,
-                          typeof field.value
-                        );
-                        return (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={
-                                  field.value === true || field.value === 1
-                                }
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="text-sm font-normal">
-                                Create
-                              </FormLabel>
-                            </div>
-                          </FormItem>
-                        );
-                      }}
-                    />
+              return (
+                <Card
+                  key={field.id}
+                  className={
+                    !hasAnyPermission ? "border-orange-200 bg-orange-50/50" : ""
+                  }
+                >
+                  <CardHeader>
+                    <CardTitle className="text-base capitalize flex items-center gap-2">
+                      {field.module} Module
+                      {!hasAnyPermission && (
+                        <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
+                          No permissions
+                        </span>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        name={`permissions.${index}.can_read`}
+                        control={form.control}
+                        render={({ field }) => {
+                          console.log(
+                            `can_read for ${fields[index]?.module}:`,
+                            field.value,
+                            typeof field.value
+                          );
+                          return (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={
+                                    field.value === true || field.value === 1
+                                  }
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal">
+                                  Read
+                                </FormLabel>
+                              </div>
+                            </FormItem>
+                          );
+                        }}
+                      />
 
-                    <FormField
-                      name={`permissions.${index}.can_update`}
-                      control={form.control}
-                      render={({ field }) => {
-                        console.log(
-                          `can_update for ${fields[index]?.module}:`,
-                          field.value,
-                          typeof field.value
-                        );
-                        return (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={
-                                  field.value === true || field.value === 1
-                                }
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="text-sm font-normal">
-                                Update
-                              </FormLabel>
-                            </div>
-                          </FormItem>
-                        );
-                      }}
-                    />
+                      <FormField
+                        name={`permissions.${index}.can_create`}
+                        control={form.control}
+                        render={({ field }) => {
+                          console.log(
+                            `can_create for ${fields[index]?.module}:`,
+                            field.value,
+                            typeof field.value
+                          );
+                          return (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={
+                                    field.value === true || field.value === 1
+                                  }
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal">
+                                  Create
+                                </FormLabel>
+                              </div>
+                            </FormItem>
+                          );
+                        }}
+                      />
 
-                    <FormField
-                      name={`permissions.${index}.can_delete`}
-                      control={form.control}
-                      render={({ field }) => {
-                        console.log(
-                          `can_delete for ${fields[index]?.module}:`,
-                          field.value,
-                          typeof field.value
-                        );
-                        return (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={
-                                  field.value === true || field.value === 1
-                                }
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel className="text-sm font-normal">
-                                Delete
-                              </FormLabel>
-                            </div>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <FormField
+                        name={`permissions.${index}.can_update`}
+                        control={form.control}
+                        render={({ field }) => {
+                          console.log(
+                            `can_update for ${fields[index]?.module}:`,
+                            field.value,
+                            typeof field.value
+                          );
+                          return (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={
+                                    field.value === true || field.value === 1
+                                  }
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal">
+                                  Update
+                                </FormLabel>
+                              </div>
+                            </FormItem>
+                          );
+                        }}
+                      />
+
+                      <FormField
+                        name={`permissions.${index}.can_delete`}
+                        control={form.control}
+                        render={({ field }) => {
+                          console.log(
+                            `can_delete for ${fields[index]?.module}:`,
+                            field.value,
+                            typeof field.value
+                          );
+                          return (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={
+                                    field.value === true || field.value === 1
+                                  }
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="text-sm font-normal">
+                                  Delete
+                                </FormLabel>
+                              </div>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
