@@ -2,9 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LoginSchema } from "./schema";
-import { useLoginMutation } from "./api/auth.api";
+import {
+  useLoginMutation,
+  useRegenerateAdminPasswordMutation,
+} from "./api/auth.api";
 import { Loader2, OctagonAlertIcon } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -22,6 +25,10 @@ import { FaGoogle, FaGithub } from "react-icons/fa";
 const LoginPage = () => {
   const navigate = useNavigate();
   const [loginFn, { error, isLoading }] = useLoginMutation();
+  const [regenerateAdminPassword, { isLoading: isRegenerating }] =
+    useRegenerateAdminPasswordMutation();
+  const [adminCreds, setAdminCreds] = useState(null);
+  const [regenError, setRegenError] = useState(null);
 
   const form = useForm({
     resolver: zodResolver(LoginSchema),
@@ -113,6 +120,52 @@ const LoginPage = () => {
                     "Sign in"
                   )}
                 </Button>
+                <div className="flex flex-col gap-2 mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={isRegenerating}
+                    onClick={async () => {
+                      setRegenError(null);
+                      setAdminCreds(null);
+                      try {
+                        const res = await regenerateAdminPassword().unwrap();
+                        setAdminCreds(res.data);
+                      } catch (err) {
+                        setRegenError(
+                          err?.data?.message ||
+                            "Failed to regenerate admin password"
+                        );
+                      }
+                    }}
+                  >
+                    {isRegenerating
+                      ? "Regenerating..."
+                      : "Regenerate Admin Password"}
+                  </Button>
+                  {regenError && (
+                    <Alert className="bg-destructive/10 border-none mt-2">
+                      <OctagonAlertIcon className="h-4 w-4 !text-destructive" />
+                      <AlertTitle>{regenError}</AlertTitle>
+                    </Alert>
+                  )}
+                  {adminCreds && (
+                    <div className="bg-muted rounded p-4 mt-2 text-center border">
+                      <div className="font-semibold mb-1">
+                        Admin Credentials
+                      </div>
+                      <div>
+                        <span className="font-medium">Username:</span>{" "}
+                        {adminCreds.username}
+                      </div>
+                      <div>
+                        <span className="font-medium">Password:</span>{" "}
+                        {adminCreds.password}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </form>
           </Form>

@@ -30,7 +30,24 @@ export const authApi = apiSlice.injectEndpoints({
       },
       transformErrorResponse: transferErrorResponse,
     }),
+    regenerateAdminPassword: builder.mutation({
+      query: () => ({
+        url: "/auth/regenerate-admin-password",
+        method: "POST",
+      }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          toast.success("Admin password regenerated!");
+        } catch (error) {
+          toast.error(
+            error?.error?.data?.message || "Failed to regenerate admin password"
+          );
+        }
+      },
+      transformErrorResponse: transferErrorResponse,
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useRegenerateAdminPasswordMutation } = authApi;
