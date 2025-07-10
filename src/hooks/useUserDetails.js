@@ -1,78 +1,39 @@
-import {
-  AlignHorizontalSpaceAroundIcon,
-  LayoutDashboardIcon,
-  UserRoundIcon,
-  ShieldIcon,
-  UsersIcon,
-  PackageIcon,
-} from "lucide-react";
-import { useSelector } from "react-redux";
+import { logOutUser } from "@/redux/slice/user.slice";
+import { purge } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const routes = [
-  {
-    icon: LayoutDashboardIcon,
-    label: "Dashboard",
-    href: "/app/dashboard",
-    mappingKey: "dashboard",
-  },
-  {
-    icon: UserRoundIcon,
-    label: "User Management",
-    href: "/app/user-management",
-    mappingKey: "users",
-  },
-  {
-    icon: AlignHorizontalSpaceAroundIcon,
-    label: "Enterprise Management",
-    href: "/app/enterprise-management",
-    mappingKey: "enterprises",
-  },
-  {
-    icon: ShieldIcon,
-    label: "Role Management",
-    href: "/app/role-management",
-    mappingKey: "roles",
-  },
-  {
-    icon: UsersIcon,
-    label: "Employee Management",
-    href: "/app/employee-management",
-    mappingKey: "employees",
-  },
-  {
-    icon: PackageIcon,
-    label: "Product Management",
-    href: "/app/product-management",
-    mappingKey: "products",
-  },
+const useUserDetails = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoggedIn, userDetails } = useSelector((state) => state.user);
 
-  // You can add more routes here
-];
+  const role = userDetails?.roles?.[0];
+  const corporate = userDetails?.corporate;
+  const name = userDetails?.first_name || "User";
+  const email = userDetails?.email;
 
-const useUserDetails = (moduleName = "") => {
-  const { isLoggedIn, userDetails, permissions } = useSelector(
-    (state) => state.auth
-  );
+  const navigateUserTo = () => {
+    if (corporate?.corporate_name == "SEBI") {
+      navigate("/app/sebi");
+    }
+    navigate("/app/sebi");
+  };
 
-  // Extract allowed modules from permission objects
-  const allowedModules = permissions?.map((perm) => perm.module) || [];
-  console.log("permissions", permissions);
-
-  // Filter routes based on allowed modules
-  const allowedRoutes = routes.filter((route) =>
-    allowedModules.includes(route.mappingKey)
-  );
-
-  const currentModulePermissions = permissions?.find(
-    (ele) => ele.module == moduleName
-  );
+  const logout = () => {
+    dispatch(logOutUser());
+    purge();
+  };
 
   return {
     isLoggedIn,
     data: userDetails,
-    permissions,
-    allowedRoutes,
-    currentModulePermissions,
+    role,
+    navigateUserTo,
+    corporate,
+    logout,
+    name,
+    email,
   };
 };
 

@@ -2,14 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LoginSchema } from "./schema";
-import {
-  useLoginMutation,
-  useRegenerateAdminPasswordMutation,
-} from "./api/auth.api";
-import { Loader2, OctagonAlertIcon } from "lucide-react";
+import FormError from "@/molecules/form-error";
+import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, Link } from "react-router-dom";
 import {
   Form,
   FormControl,
@@ -18,159 +14,117 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, AlertTitle } from "@/components/ui/alert";
-import { FaGoogle, FaGithub } from "react-icons/fa";
+import { userLoginThunk } from "@/redux/thunks/user.thunk";
+import { useDispatch } from "react-redux";
+import useUserDetails from "@/hooks/useUserDetails";
+import Password from "@/molecules/password";
 
 const LoginPage = () => {
-  const navigate = useNavigate();
-  const [loginFn, { error, isLoading }] = useLoginMutation();
-  const [regenerateAdminPassword, { isLoading: isRegenerating }] =
-    useRegenerateAdminPasswordMutation();
-  const [adminCreds, setAdminCreds] = useState(null);
-  const [regenError, setRegenError] = useState(null);
-
+  const dispatch = useDispatch();
+  const { navigateUserTo } = useUserDetails();
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
 
   const onSubmit = async (data) => {
-    const response = await loginFn(data);
-    if (response.data) {
-      navigate("/app/auth-loading");
+    try {
+      setLoading(true);
+      const response = await dispatch(userLoginThunk({ ...data })).unwrap();
+
+      setLoading(false);
+
+      if (!response?.success) {
+        setError(response?.data?.msg);
+      }
+
+      if (response?.data) {
+        navigateUserTo();
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(error?.response?.data?.msg);
+      console.log("ERROR-LOGIN-SCREEN - ", error);
     }
   };
 
   return (
-    <div className="flex w-full justify-center items-center h-screen px-4">
-      <Card className="overflow-hidden p-0 w-full max-w-md">
-        <CardContent className="grid p-0">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col items-center text-center">
-                  <h1 className="text-2xl font-bold">Welcome Back</h1>
-                  <p className="text-muted-foreground text-balance">
-                    Login to your account
-                  </p>
-                </div>
-
-                <div className="grid gap-3">
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter your username"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid gap-3">
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="*********"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {error && (
-                  <Alert className="bg-destructive/10 border-none">
-                    <OctagonAlertIcon className="h-4 w-4 !text-destructive" />
-                    <AlertTitle>
-                      {error?.data?.message ||
-                        error?.data?.err ||
-                        "Login failed. Please check your credentials."}
-                    </AlertTitle>
-                  </Alert>
-                )}
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      Signing in...{" "}
-                      <Loader2 className="animate-spin size-5 ml-2" />
-                    </>
-                  ) : (
-                    "Sign in"
-                  )}
-                </Button>
-                <div className="flex flex-col gap-2 mt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    disabled={isRegenerating}
-                    onClick={async () => {
-                      setRegenError(null);
-                      setAdminCreds(null);
-                      try {
-                        const res = await regenerateAdminPassword().unwrap();
-                        setAdminCreds(res.data);
-                      } catch (err) {
-                        setRegenError(
-                          err?.data?.message ||
-                            "Failed to regenerate admin password"
-                        );
-                      }
-                    }}
-                  >
-                    {isRegenerating
-                      ? "Regenerating..."
-                      : "Regenerate Admin Password"}
-                  </Button>
-                  {regenError && (
-                    <Alert className="bg-destructive/10 border-none mt-2">
-                      <OctagonAlertIcon className="h-4 w-4 !text-destructive" />
-                      <AlertTitle>{regenError}</AlertTitle>
-                    </Alert>
-                  )}
-                  {adminCreds && (
-                    <div className="bg-muted rounded p-4 mt-2 text-center border">
-                      <div className="font-semibold mb-1">
-                        Admin Credentials
-                      </div>
-                      <div>
-                        <span className="font-medium">Username:</span>{" "}
-                        {adminCreds.username}
-                      </div>
-                      <div>
-                        <span className="font-medium">Password:</span>{" "}
-                        {adminCreds.password}
-                      </div>
+    <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm md:max-w-3xl ">
+        <div className="flex flex-col gap-6">
+          <Card className="overflow-hidden p-0">
+            <CardContent className="grid p-0 md:grid-cols-2">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="p-6 md:p-8 "
+                >
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col items-center text-center">
+                      <h1 className="text-2xl font-bold">Welcome Back</h1>
+                      <p className="text-muted-foreground text-balance">
+                        Login to your account
+                      </p>
                     </div>
-                  )}
-                </div>
+
+                    <div className="grid gap-3">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="john@example.com"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid gap-3">
+                      <Password
+                        control={form.control}
+                        fieldName="password"
+                        label="Password"
+                        placeholder="Enter your password"
+                      />
+                    </div>
+                    {error && <FormError error={error} />}
+
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      Sign in
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+
+              <div className="bg-radial from-blue-600 to-blue-900 relative hidden md:flex flex-col gap-y-4 items-center justify-center">
+                <img
+                  src={"/logo.svg"}
+                  alt="image"
+                  className="h-[92px] w-[92px]"
+                />
+                <p className="text-2xl font-semibold text-white">NISM</p>
               </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4 ">
+            By clicking continue, you agree to our{" "}
+            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

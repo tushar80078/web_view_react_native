@@ -1,16 +1,11 @@
 import { z } from "zod";
 
-// Username validation
-const usernameValidation = z
-  .string()
-  .min(1, "Username required")
-  .min(3, "Username must be at least 3 characters");
-
-// Password validation
-const passwordValidation = z.string().min(1, "Password required");
-
-// Login schema
 export const LoginSchema = z.object({
-  username: usernameValidation,
-  password: passwordValidation,
+  email: z
+    .string()
+    .min(1, { message: "Email required" })
+    .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, {
+      message: "Invalid email",
+    }),
+  password: z.string().min(1, { message: "Password required" }),
 });
