@@ -6,6 +6,7 @@ export const userLoginThunk = createAsyncThunk(
   async (model, thunkApi) => {
     try {
       const { email, password } = model;
+
       let res = await getAxios().post(`/user/login`, {
         email: email,
         password: password,

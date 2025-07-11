@@ -9,8 +9,10 @@ import React, { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { uploadBulkFile } from "@/redux/thunks/corporate.thunk";
 import FormError from "@/molecules/form-error";
+import useExcelUpload from "@/hooks/useExcelUpload";
 
 const UploadExcelForm = ({ onClose }) => {
+  const { setDataInSlice } = useExcelUpload();
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
@@ -51,15 +53,18 @@ const UploadExcelForm = ({ onClose }) => {
       if (result && result.errorFile) {
         setErrorExcelFile(result.errorFile);
         setError(
-          " The uploaded Excel file contains validation errors. Please click the button below to view the detailed errors."
+          "The uploaded Excel file contains validation errors. Please click the button below to view the detailed errors."
         );
+        setDataInSlice([]);
       } else if (result?.success) {
-        // Do needfull
+        setDataInSlice(result?.data?.certificationRecords || []);
         onClose();
       } else {
+        setDataInSlice([]);
         setError("Unknown response from server.");
       }
     } catch (err) {
+      setDataInSlice([]);
       setError(typeof err === "string" ? err : "Upload failed");
     } finally {
       setLoading(false);
@@ -81,8 +86,8 @@ const UploadExcelForm = ({ onClose }) => {
 
   return (
     <div className="w-full flex flex-col  overflow-auto">
-      <div className="flex  w-[100%] ">
-        <div className="border border-green-400 bg-green-100 text-green-800 rounded-md   text-sm  p-4 w-[50%]">
+      <div className=" w-[100%] lg:flex md:flex ">
+        <div className="border border-green-400 bg-green-100 text-green-800 rounded-md   text-sm  p-4  w-aut0 lg:w-[50%] md:w-[50%]">
           <div className="flex justify-center">
             <div className="bg-green-300/50 p-3 rounded-full ">
               <UploadIcon className="size-6" />
@@ -117,7 +122,7 @@ const UploadExcelForm = ({ onClose }) => {
             </Button>
           </div>
         </div>
-        <div className="border border-yellow-400 bg-yellow-100 text-yellow-800 rounded-md  text-sm  p-4 ml-2 w-[50%]">
+        <div className="border border-yellow-400 bg-yellow-100 text-yellow-800 rounded-md  text-sm  p-4 lg:ml-2 md:ml-2 mt-2 lg:mt-0 md:mt-0 w-auto lg:w-[50%] md:w-[50%]">
           <p className="font-semibold">Instructions:</p>
           <ul className="list-disc list-inside space-y-1">
             <li>
@@ -137,6 +142,7 @@ const UploadExcelForm = ({ onClose }) => {
           </ul>
         </div>
       </div>
+
       {error && (
         <FormError error={error || "Something went wrong. Please try again"} />
       )}

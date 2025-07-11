@@ -53,7 +53,7 @@ const AuthLayout = ({ children }) => {
       {/* Content */}
       <div className=" lg:px-14 px-3   -mt-[20vh] h-[67vh] ">
         <div className="max-w-screen-2xl  h-full   mx-auto w-full ">
-          <ScrollArea className="bg-white rounded-md h-full  overflow-auto">
+          <ScrollArea className="bg-white rounded-md h-full  overflow-auto shadow-md">
             {children}
           </ScrollArea>
         </div>
