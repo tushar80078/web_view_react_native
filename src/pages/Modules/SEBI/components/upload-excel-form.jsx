@@ -9,10 +9,8 @@ import React, { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { uploadBulkFile } from "@/redux/thunks/corporate.thunk";
 import FormError from "@/molecules/form-error";
-import useExcelUpload from "@/hooks/useExcelUpload";
 
-const UploadExcelForm = ({ onClose }) => {
-  const { setDataInSlice } = useExcelUpload();
+const UploadExcelForm = ({ onClose, setExcelResponseData }) => {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
@@ -55,16 +53,16 @@ const UploadExcelForm = ({ onClose }) => {
         setError(
           "The uploaded Excel file contains validation errors. Please click the button below to view the detailed errors."
         );
-        setDataInSlice([]);
+        setExcelResponseData([]);
       } else if (result?.success) {
-        setDataInSlice(result?.data?.certificationRecords || []);
+        setExcelResponseData(result?.data?.certificationRecords || []);
         onClose();
       } else {
-        setDataInSlice([]);
+        setExcelResponseData([]);
         setError("Unknown response from server.");
       }
     } catch (err) {
-      setDataInSlice([]);
+      setExcelResponseData([]);
       setError(typeof err === "string" ? err : "Upload failed");
     } finally {
       setLoading(false);

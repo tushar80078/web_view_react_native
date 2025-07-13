@@ -6,10 +6,10 @@ const ExcelDataHeader = ({ copied, handleCopyJSON }) => {
   return (
     <div className="flex justify-between items-center">
       <div
-        className="text-lg text-emerald-700 flex justify-between items-center"
+        className="text-lg text-green-600 flex justify-between items-center"
         style={{ fontWeight: "500" }}
       >
-        <FileSpreadsheetIcon className="size-5 mr-1 " />
+        <CheckIcon className="size-5 mr-1 " />
         Excel Data Fetched
       </div>
       <Button

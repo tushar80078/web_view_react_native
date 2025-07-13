@@ -18,10 +18,6 @@ const routes = [
     href: "/app/sebi",
     label: "Bulk Upload",
   },
-  {
-    href: "/app/bb",
-    label: " Upload",
-  },
 ];
 
 const Navigation = () => {

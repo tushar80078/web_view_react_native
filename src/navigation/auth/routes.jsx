@@ -11,14 +11,4 @@ export const authRoutes = [
     title: "Sebi",
     corporate: ["sebi"],
   },
-  {
-    path: "/bb",
-    access: ["All"],
-    description: "This is for sebi corporation",
-    element: <Sebi />,
-    isShowOnSidebar: false,
-    icon: false,
-    title: "Sebi",
-    corporate: ["sebi"],
-  },
 ];

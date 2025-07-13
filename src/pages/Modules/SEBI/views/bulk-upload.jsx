@@ -1,17 +1,24 @@
 import ResponsiveDialog from "@/components/responsive-modal";
 import { Button } from "@/components/ui/button";
-import { DownloadIcon, UploadIcon, CopyIcon, CheckIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  UploadIcon,
+  CopyIcon,
+  CheckIcon,
+  FileSpreadsheetIcon,
+} from "lucide-react";
 import React, { useState } from "react";
 import UploadExcelForm from "../components/upload-excel-form";
-import useExcelUpload from "@/hooks/useExcelUpload";
 import ReactJson from "react-json-view";
-import copy from "copy-to-clipboard"; // <--- NEW IMPORT
+import copy from "copy-to-clipboard";
 import ExcelDataHeader from "../components/excel-data-header";
+import JSONViewer from "../components/json-viewer";
 
 const BulkUpload = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [copied, setCopied] = useState(false); // <--- NEW STATE
-  const { data } = useExcelUpload();
+
+  const [copied, setCopied] = useState(false);
+  const [excelResponse, setExcelResponse] = useState([]);
 
   const handleDownloadTemplate = () => {
     const link = document.createElement("a");
@@ -23,7 +30,7 @@ const BulkUpload = () => {
   };
 
   const handleCopyJSON = () => {
-    copy(JSON.stringify(data, null, 2));
+    copy(JSON.stringify(excelResponse, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000); // reset after 2 sec
   };
@@ -53,21 +60,20 @@ const BulkUpload = () => {
       </div>
 
       <div className="h-full mt-4 space-y-4">
-        {data?.length > 0 && (
-          <ExcelDataHeader handleCopyJSON={handleCopyJSON} copied={copied} />
+        {excelResponse?.length > 0 && (
+          <div>
+            <ExcelDataHeader handleCopyJSON={handleCopyJSON} copied={copied} />
+            <JSONViewer data={excelResponse} />
+          </div>
         )}
 
-        {data?.length > 0 && (
-          <>
-            {/* JSON Viewer */}
-            <ReactJson
-              src={data}
-              name={false}
-              enableClipboard={false}
-              displayDataTypes={false}
-              collapsed={false}
-            />
-          </>
+        {excelResponse?.length === 0 && (
+          <diV className="h-90 rounded-md flex justify-center bg-slate-800/10 items-center flex-col">
+            <FileSpreadsheetIcon className="text-slate-400 size-40" />
+            <p className="mt-4 text-slate-700">
+              Please upload Excel(.csv) to get your JSON response
+            </p>
+          </diV>
         )}
       </div>
 
@@ -77,7 +83,10 @@ const BulkUpload = () => {
         title="Bulk Upload"
         description="Upload excel file."
       >
-        <UploadExcelForm onClose={() => setIsModalOpen(!isModalOpen)} />
+        <UploadExcelForm
+          onClose={() => setIsModalOpen(!isModalOpen)}
+          setExcelResponseData={(ele) => setExcelResponse([...ele])}
+        />
       </ResponsiveDialog>
     </div>
   );
