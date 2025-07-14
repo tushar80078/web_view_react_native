@@ -1,15 +1,24 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import LandingPage from "@/pages/Landing";
 import PublicRoutes from "./public";
-import useUserDetails from "@/hooks/useUserDetails";
 import AuthenticatedRoutes from "./auth";
+import useUserDetails from "@/hooks/useUserDetails";
 
 const Root = () => {
-  const { isLoggedIn } = useUserDetails();
+  const { logout } = useUserDetails();
+
+  const getToken = () => {
+    let userToken = localStorage.getItem("token");
+    if (userToken) {
+      return true;
+    } else {
+      logout();
+      return false;
+    }
+  };
 
   return (
     <Routes>
-      {isLoggedIn ? (
+      {getToken() ? (
         <>
           {/**-------------  Authenticated Routes -------------**/}
           <Route
@@ -25,10 +34,10 @@ const Root = () => {
       )}
 
       <Route
-        path={"/"}
+        path={"/*"}
         element={
-          isLoggedIn ? (
-            <Navigate replace to={`/app`} />
+          getToken() ? (
+            <Navigate replace to={`/app/*`} />
           ) : (
             <Navigate replace to={`/*`} />
           )

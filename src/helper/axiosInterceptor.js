@@ -41,6 +41,7 @@ const getAxios = (specificBaseUrl) => {
         //dispatch action using store to show token expire popup-----
         localStorage.removeItem("token");
         window.location.pathname = "/";
+
         return new Promise((resolve, reject) => {
           reject(error);
         });
