@@ -9,6 +9,7 @@ import React, { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { uploadBulkFile } from "@/redux/thunks/corporate.thunk";
 import FormError from "@/molecules/form-error";
+import toast from "react-hot-toast";
 
 const UploadExcelForm = ({ onClose, setExcelResponseData }) => {
   const dispatch = useDispatch();
@@ -50,20 +51,27 @@ const UploadExcelForm = ({ onClose, setExcelResponseData }) => {
 
       if (result && result.errorFile) {
         setErrorExcelFile(result.errorFile);
-        setError(
-          "The uploaded Excel file contains validation errors. Please click the button below to view the detailed errors."
-        );
-        setExcelResponseData([]);
-      } else if (result?.success) {
-        setExcelResponseData(result?.data?.certificationRecords || []);
+        const errorText =
+          "The uploaded Excel file contains validation errors. Please click the button below to view the detailed errors.";
+        setError(errorText);
+        toast.error(errorText);
+        setExcelResponseData(null);
+      } else if (result?.jsonBlob) {
+        toast.success("Excel uploaded successfully!");
+        setExcelResponseData(result.jsonBlob);
         onClose();
       } else {
-        setExcelResponseData([]);
+        toast.error(
+          "Unknown response from server. Please contact administrator."
+        );
+        setExcelResponseData(null);
         setError("Unknown response from server.");
       }
     } catch (err) {
-      setExcelResponseData([]);
-      setError(typeof err === "string" ? err : "Upload failed");
+      setExcelResponseData(null);
+      const errorText = typeof err === "string" ? err : "Upload failed";
+      setError(errorText);
+      toast.error(errorText);
     } finally {
       setLoading(false);
     }

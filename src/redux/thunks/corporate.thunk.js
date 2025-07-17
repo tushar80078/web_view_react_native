@@ -19,12 +19,9 @@ export const uploadBulkFile = createAsyncThunk(
 
       if (contentType.includes("text/csv")) {
         return { errorFile: res.data };
+      } else if (contentType.includes("application/json")) {
+        return { jsonBlob: res.data };
       }
-
-      const text = await res.data.text();
-      const json = JSON.parse(text);
-
-      return json;
     } catch (error) {
       const contentType = error?.response?.headers?.["content-type"];
       const data = error?.response?.data;

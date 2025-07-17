@@ -21,12 +21,14 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import useUserDetails from "@/hooks/useUserDetails";
 import { ChevronDownIcon, LogOutIcon } from "lucide-react";
 import React from "react";
+import toast from "react-hot-toast";
 
 const UserButton = () => {
   const isMobile = useIsMobile();
   const { logout, email, name } = useUserDetails();
-  console.log("email, name", email, name);
+
   const handleLogout = () => {
+    toast.success("Logged out!");
     logout();
   };
 

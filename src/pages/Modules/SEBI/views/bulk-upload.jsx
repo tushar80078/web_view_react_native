@@ -3,22 +3,17 @@ import { Button } from "@/components/ui/button";
 import {
   DownloadIcon,
   UploadIcon,
-  CopyIcon,
-  CheckIcon,
   FileSpreadsheetIcon,
+  FileJsonIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UploadExcelForm from "../components/upload-excel-form";
-import ReactJson from "react-json-view";
-import copy from "copy-to-clipboard";
-import ExcelDataHeader from "../components/excel-data-header";
-import JSONViewer from "../components/json-viewer";
+import toast from "react-hot-toast";
 
 const BulkUpload = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [copied, setCopied] = useState(false);
-  const [excelResponse, setExcelResponse] = useState([]);
+  const [parsedJSON, setParsedJSON] = useState(null);
+  const [excelResponse, setExcelResponse] = useState(null);
 
   const handleDownloadTemplate = () => {
     const link = document.createElement("a");
@@ -27,19 +22,41 @@ const BulkUpload = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success("Template Downloaded!");
   };
 
-  const handleCopyJSON = () => {
-    copy(JSON.stringify(excelResponse, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // reset after 2 sec
+  const convertBlobToJSON = async () => {
+    if (excelResponse instanceof Blob) {
+      try {
+        const text = await excelResponse.text();
+        const json = JSON.parse(text);
+        setParsedJSON(json);
+      } catch (err) {
+        console.error("Failed to parse blob as JSON:", err);
+        toast.error("Invalid JSON file received.");
+      }
+    }
   };
+
+  const donwloadJson = () => {
+    const url = URL.createObjectURL(excelResponse);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "certification_data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("File Downloaded.");
+  };
+
+  useEffect(() => {
+    convertBlobToJSON();
+  }, [excelResponse]);
 
   return (
     <div className="h-full w-full px-5 py-3">
       <div className="flex mt-4  ">
         <div className="lg:flex lg:flex-row lg:justify-between md:flex md:flex-row md:justify-between w-full flex flex-col justify-center  items-center">
-          <div className="text-2xl w-full flex ">Bulk Upload</div>
+          <div className="text-2xl w-full flex outfit-bold ">Bulk Upload</div>
           <div className="flex flex-col lg:flex-row md:flex-row gap-2 w-full lg:justify-end md:justify-end mt-2 lg:mt-0">
             <Button
               onClick={() => setIsModalOpen(true)}
@@ -59,19 +76,60 @@ const BulkUpload = () => {
         </div>
       </div>
 
-      <div className="h-full mt-4 space-y-4">
-        {excelResponse?.length > 0 && (
+      <div className="h-full w-full mt-4 space-y-4">
+        {excelResponse && (
           <div>
-            <ExcelDataHeader handleCopyJSON={handleCopyJSON} copied={copied} />
-            <JSONViewer data={excelResponse} />
+            <div className="outfit-bold text-xl mb-4 text-green-600">
+              JSON File Ready To Download
+            </div>
+            <diV className="h-80 px-5 py-5  rounded-md flex justify-center bg-slate-800/10 items-center md:flex-row flex-col">
+              <div className="border border-green-400 bg-green-100 text-green-600 rounded-md  h-65  text-sm w-full md:flex-col  flex justify-center items-center p-4  w-aut0 md:w-[50%]">
+                <div className="bg-green-300/50 p-5 rounded-full ">
+                  <FileJsonIcon className="size-20 text-emerald-600" />
+                </div>
+                <Button
+                  className="mt-7"
+                  onClick={() => donwloadJson()}
+                  size={"lg"}
+                >
+                  <DownloadIcon className="mr-2" />
+                  Download Certification JSON File
+                </Button>
+              </div>
+              <div className="border border-yellow-400 bg-yellow-100 text-yellow-800 rounded-md  h-65 text-sm p-4 lg:ml-2 md:ml-2 mt-2 lg:mt-0 md:mt-0 w-auto lg:w-[50%] md:w-[50%]">
+                <p className="outfit-bold text-xl text-black">
+                  Response Summary :{" "}
+                </p>
+
+                <ul className="list-disc list-inside space-y-1 text-lg">
+                  <li>
+                    Total Records :{" "}
+                    <strong>{parsedJSON?.data?.totalRecords}</strong>.
+                  </li>
+                  <li>
+                    Successfully Fetched Records :{" "}
+                    <strong>
+                      {parsedJSON?.data?.certificationRecords?.matched?.length}
+                    </strong>
+                  </li>
+                  <li>
+                    Failed Certification Records :
+                    <strong>
+                      {parsedJSON?.data?.certificationRecords?.failed?.length}
+                    </strong>
+                  </li>
+                  <li>Please donwload JSON file to check details.</li>
+                </ul>
+              </div>
+            </diV>
           </div>
         )}
 
-        {excelResponse?.length === 0 && (
-          <diV className="h-90 rounded-md flex justify-center bg-slate-800/10 items-center flex-col">
+        {!excelResponse && (
+          <diV className="h-92 rounded-md flex justify-center bg-slate-800/10 items-center flex-col">
             <FileSpreadsheetIcon className="text-slate-400 size-40" />
             <p className="mt-4 text-slate-700">
-              Please upload Excel(.csv) to get your JSON response
+              Please upload Excel(.csv) to get your JSON response file.
             </p>
           </diV>
         )}
@@ -85,7 +143,7 @@ const BulkUpload = () => {
       >
         <UploadExcelForm
           onClose={() => setIsModalOpen(!isModalOpen)}
-          setExcelResponseData={(ele) => setExcelResponse([...ele])}
+          setExcelResponseData={(ele) => setExcelResponse(ele)}
         />
       </ResponsiveDialog>
     </div>

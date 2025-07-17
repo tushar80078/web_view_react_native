@@ -18,6 +18,7 @@ import { userLoginThunk } from "@/redux/thunks/user.thunk";
 import { useDispatch } from "react-redux";
 import useUserDetails from "@/hooks/useUserDetails";
 import Password from "@/molecules/password";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -40,13 +41,16 @@ const LoginPage = () => {
       setLoading(false);
 
       if (!response?.success) {
+        toast.error(response?.data?.msg || "Please try again.");
         setError(response?.data?.msg);
       }
 
       if (response?.data) {
+        toast.success("Logged in!");
         navigateUserTo();
       }
     } catch (error) {
+      toast.error(error?.response?.data?.msg || "Please try again.");
       setLoading(false);
       setError(error?.response?.data?.msg);
       console.log("ERROR-LOGIN-SCREEN - ", error);
