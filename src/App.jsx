@@ -8,10 +8,17 @@ function App() {
 
   useEffect(() => {
     const handleMessage = (event) => {
-      console.log("Received message from React Native WebView:", event.data);
-      if (typeof event.data === "string") {
-        // FCM token received
-        console.log("FCM Token:", event.data);
+      // Add additional checks for the event origin if needed for security
+      try {
+        const data =
+          typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+
+        if (data && data.type === "fcmToken") {
+          console.log("FCM Token received:", data.token);
+        }
+      } catch (error) {
+        console.log("Regular message:", event.data);
+        console.log("error parsing message:", error);
       }
     };
 
