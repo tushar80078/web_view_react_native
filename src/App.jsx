@@ -8,17 +8,29 @@ function App() {
 
   useEffect(() => {
     const handleMessage = (event) => {
-      // Add additional checks for the event origin if needed for security
       try {
         const data =
           typeof event.data === "string" ? JSON.parse(event.data) : event.data;
 
         if (data && data.type === "fcmToken") {
           console.log("FCM Token received:", data.token);
+
+          // Send confirmation back to React Native
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                type: "tokenReceived",
+                token: data.token,
+              })
+            );
+          } else {
+            // Fallback for testing in browser
+            console.log("Would send confirmation to React Native:", data.token);
+          }
         }
       } catch (error) {
         console.log("Regular message:", event.data);
-        console.log("error parsing message:", error);
+        console.log("Error parsing message:", error);
       }
     };
 
