@@ -5,10 +5,9 @@ import LandingPage from "@/pages/Landing";
 const PublicRoutes = () => {
   return (
     <Routes>
-      <Route path="/home" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
 
-      <Route path={"/*"} element={<Navigate replace to={`/home`} />} />
+      <Route path={"/*"} element={<Navigate replace to={`/login`} />} />
     </Routes>
   );
 };

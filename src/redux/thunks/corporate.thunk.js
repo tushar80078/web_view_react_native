@@ -2,13 +2,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import getAxios from "@/helper/axiosInterceptor";
 
 export const uploadBulkFile = createAsyncThunk(
-  "corporate/uploadBulkFile",
+  "certification/uploadBulkFile",
   async (file, thunkApi) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await getAxios().post(`/corporate/upload-csv`, formData, {
+      const res = await getAxios().post(`/certification/upload-csv`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
