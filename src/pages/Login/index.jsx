@@ -59,10 +59,10 @@ const LoginPage = () => {
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-3xl ">
+      <div className="w-full max-w-sm md:max-w-lg ">
         <div className="flex flex-col gap-6">
           <Card className="overflow-hidden p-0">
-            <CardContent className="grid p-0 md:grid-cols-2">
+            <CardContent className="grid p-0 md:grid-cols-1">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
@@ -112,15 +112,6 @@ const LoginPage = () => {
                   </div>
                 </form>
               </Form>
-
-              <div className="bg-radial from-blue-600 to-blue-900 relative hidden md:flex flex-col gap-y-4 items-center justify-center">
-                <img
-                  src={"/logo.svg"}
-                  alt="image"
-                  className="h-[92px] w-[92px]"
-                />
-                <p className="text-2xl font-semibold text-white">NISM</p>
-              </div>
             </CardContent>
           </Card>
           <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4 ">

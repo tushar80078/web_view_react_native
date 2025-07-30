@@ -3,8 +3,59 @@ import "./App.css";
 import { Button } from "./components/ui/button";
 import { HashRouter } from "react-router-dom";
 import Root from "@/navigation";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    const handleMessage = (event) => {
+      try {
+        const data =
+          typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+
+        if (data && data.type === "fcmToken") {
+          console.log("FCM Token received:", data.token);
+
+          // Send confirmation back to React Native
+          if (window.ReactNativeWebView) {
+            localStorage.setItem("fcmToken", data.token);
+            window.alert("FCM Token received and stored.", data.token);
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                type: "tokenReceived",
+                token: data.token,
+              })
+            );
+          } else {
+            // Fallback for testing in browser
+            console.log("Would send confirmation to React Native:", data.token);
+          }
+        }
+      } catch (error) {
+        console.log("Regular message:", event.data);
+        console.log("Error parsing message:", error);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  let token = localStorage.getItem("fcmToken");
+
+  if (!token) {
+    return (
+      <div>
+        <h1 className="text-center text-2xl font-bold">
+          Waiting for FCM Token...
+        </h1>
+        <p className="text-center mt-4">
+          Please ensure your React Native app is running and has sent the token.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <HashRouter>
       <Toaster position="top-right" />

@@ -7,9 +7,12 @@ export const userLoginThunk = createAsyncThunk(
     try {
       const { email, password } = model;
 
-      let res = await getAxios().post(`/user/login`, {
-        email: email,
+      const fcmToken = localStorage.getItem("fcmToken");
+
+      let res = await getAxios().post(`/notifications/login`, {
+        username: email,
         password: password,
+        fcmtoken: fcmToken || "",
       });
 
       const responseData = res.data;
