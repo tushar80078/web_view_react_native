@@ -13,8 +13,6 @@ function App() {
           typeof event.data === "string" ? JSON.parse(event.data) : event.data;
 
         if (data && data.type === "fcmToken") {
-          console.log("FCM Token received:", data.token);
-
           // Send confirmation back to React Native
           if (window.ReactNativeWebView) {
             window.ReactNativeWebView.postMessage(
