@@ -1,6 +1,6 @@
 import { Toaster } from "react-hot-toast";
 import "./App.css";
-import { Button } from "./components/ui/button";
+
 import { HashRouter } from "react-router-dom";
 import Root from "@/navigation";
 import { useEffect, useState } from "react";
@@ -20,7 +20,7 @@ function App() {
           if (window.ReactNativeWebView) {
             localStorage.setItem("fcmToken", data.token);
             setFcmToken(data.token);
-            window.alert("FCM Token received and stored.", data.token);
+
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
                 type: "tokenReceived",
