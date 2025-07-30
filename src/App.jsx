@@ -3,9 +3,10 @@ import "./App.css";
 import { Button } from "./components/ui/button";
 import { HashRouter } from "react-router-dom";
 import Root from "@/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
+  const [fcmToken, setFcmToken] = useState(null);
   useEffect(() => {
     const handleMessage = (event) => {
       try {
@@ -18,6 +19,7 @@ function App() {
           // Send confirmation back to React Native
           if (window.ReactNativeWebView) {
             localStorage.setItem("fcmToken", data.token);
+            setFcmToken(data.token);
             window.alert("FCM Token received and stored.", data.token);
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
@@ -41,9 +43,7 @@ function App() {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  let token = localStorage.getItem("fcmToken");
-
-  if (!token) {
+  if (!fcmToken) {
     return (
       <div>
         <h1 className="text-center text-2xl font-bold">
