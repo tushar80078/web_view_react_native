@@ -40,10 +40,10 @@ const LoginPage = () => {
 
       setLoading(false);
 
-      if (!response?.success) {
-        toast.error(response?.data?.msg || "Please try again.");
-        setError(response?.data?.msg);
-      }
+      // if (!response?.success) {
+      //   toast.error(response?.data?.msg || "Please try again.");
+      //   setError(response?.data?.msg);
+      // }
 
       if (response?.data) {
         toast.success("Logged in!");
