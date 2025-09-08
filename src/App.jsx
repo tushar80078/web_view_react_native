@@ -41,18 +41,18 @@ function App() {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  if (!fcmToken) {
-    return (
-      <div>
-        <h1 className="text-center text-2xl font-bold">
-          Waiting for FCM Token...
-        </h1>
-        <p className="text-center mt-4">
-          Please ensure your React Native app is running and has sent the token.
-        </p>
-      </div>
-    );
-  }
+  // if (!fcmToken) {
+  //   return (
+  //     <div>
+  //       <h1 className="text-center text-2xl font-bold">
+  //         Waiting for FCM Token...
+  //       </h1>
+  //       <p className="text-center mt-4">
+  //         Please ensure your React Native app is running and has sent the token.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <HashRouter>
